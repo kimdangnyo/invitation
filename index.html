@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>☁️행운의 편지☁️</title>
+
+<style>
+:root{
+  --sky-top:#BEE3FF;
+  --sky-bottom:#F6FBFF;
+  --card:#FFFFFF;
+  --border:#E3EFFA;
+  --primary:#4DA3FF;
+  --radius:22px;
+  --shadow:0 10px 25px rgba(0,0,0,0.08);
+  font-family:"Noto Sans KR", system-ui, sans-serif;
+}
+
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:linear-gradient(to bottom,var(--sky-top),var(--sky-bottom));
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+  position:relative;
+}
+
+/* 구름 */
+.cloud{
+  position:absolute;
+  background:#fff;
+  border-radius:999px;
+  opacity:0.9;
+}
+.cloud::before,
+.cloud::after{
+  content:"";
+  position:absolute;
+  background:#fff;
+  border-radius:999px;
+}
+.cloud.one{
+  width:140px;height:46px;
+  top:80px;left:10%;
+}
+.cloud.one::before{
+  width:60px;height:60px;
+  top:-25px;left:20px;
+}
+.cloud.one::after{
+  width:70px;height:70px;
+  top:-30px;right:25px;
+}
+
+/* 카드 */
+.container{
+  position:relative;
+  width:380px;
+  height:260px;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow);
+  background:var(--card);
+  border:1px solid var(--border);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:20px;
+}
+
+.content{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:18px;
+}
+
+.message{
+  font-size:20px;
+  font-weight:800;
+  color:var(--primary);
+}
+
+/* 버튼 중앙 정렬 */
+.buttons{
+  display:flex;
+  gap:16px;
+  opacity:0;
+  transition:opacity .4s ease;
+}
+
+.buttons.show{
+  opacity:1;
+}
+
+button{
+  padding:10px 22px;
+  border-radius:999px;
+  border:none;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.yes{
+  background:var(--primary);
+  color:white;
+}
+
+.no{
+  background:#EAF4FF;
+  color:var(--primary);
+}
+
+/* 스크래치 */
+canvas{
+  position:absolute;
+  top:0;
+  left:0;
+  transition:transform .4s ease, opacity .4s ease;
+}
+
+.explode{
+  transform:scale(1.3);
+  opacity:0;
+}
+
+/* 페이지 폭발 */
+.page-explode{
+  animation:explodePage .7s ease forwards;
+}
+@keyframes explodePage{
+  0%{transform:scale(1);opacity:1;}
+  40%{transform:scale(1.1);}
+  100%{transform:scale(2);opacity:0;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="cloud one"></div>
+
+<div class="container">
+  <div class="content">
+    <div class="message">
+      🪨 나랑 발렌타인데이 같이 보낼래? 🪨
+    </div>
+
+    <div class="buttons" id="btnGroup">
+      <button class="yes">YES</button>
+      <button class="no">NO</button>
+    </div>
+  </div>
+
+  <canvas id="scratch"></canvas>
+</div>
+
+<script>
+const canvas=document.getElementById("scratch");
+const ctx=canvas.getContext("2d");
+const container=document.querySelector(".container");
+const btnGroup=document.getElementById("btnGroup");
+
+canvas.width=container.offsetWidth;
+canvas.height=container.offsetHeight;
+
+/* 회색 은박 */
+function drawCover(){
+  ctx.globalCompositeOperation="source-over";
+
+  const grad=ctx.createLinearGradient(0,0,canvas.width,canvas.height);
+  grad.addColorStop(0,"#d9d9d9");
+  grad.addColorStop(0.5,"#bfbfbf");
+  grad.addColorStop(1,"#d9d9d9");
+
+  ctx.fillStyle=grad;
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  ctx.fillStyle="#555";
+  ctx.font="bold 20px Noto Sans KR";
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+  ctx.fillText("✨ 긁으면 짱짱 좋은 일 생김~~ ✨",
+               canvas.width/2,canvas.height/2);
+
+  ctx.globalCompositeOperation="destination-out";
+}
+drawCover();
+
+let drawing=false;
+let revealed=false;
+
+function getPos(e){
+ const rect=canvas.getBoundingClientRect();
+ return{
+  x:(e.touches?e.touches[0].clientX:e.clientX)-rect.left,
+  y:(e.touches?e.touches[0].clientY:e.clientY)-rect.top
+ };
+}
+
+function draw(e){
+ if(!drawing||revealed) return;
+ const pos=getPos(e);
+ ctx.beginPath();
+ ctx.arc(pos.x,pos.y,22,0,Math.PI*2);
+ ctx.fill();
+ check();
+}
+
+function check(){
+ const img=ctx.getImageData(0,0,canvas.width,canvas.height);
+ let cleared=0;
+ for(let i=3;i<img.data.length;i+=4){
+  if(img.data[i]===0) cleared++;
+ }
+ const percent=cleared/(canvas.width*canvas.height);
+
+ if(percent>0.5&&!revealed){
+  revealed=true;
+  reveal();
+ }
+}
+
+function reveal(){
+ canvas.classList.add("explode");
+ setTimeout(()=>{
+  canvas.style.display="none";
+  btnGroup.classList.add("show");
+ },400);
+}
+
+canvas.addEventListener("mousedown",()=>drawing=true);
+canvas.addEventListener("mouseup",()=>drawing=false);
+canvas.addEventListener("mousemove",draw);
+canvas.addEventListener("touchstart",()=>drawing=true,{passive:true});
+canvas.addEventListener("touchend",()=>drawing=false,{passive:true});
+canvas.addEventListener("touchmove",draw,{passive:true});
+
+/* YES */
+document.querySelector(".yes").addEventListener("click",()=>{
+ document.body.classList.add("page-explode");
+ setTimeout(()=>{
+  window.location.href="invite.html";
+ },700);
+});
+
+/* NO */
+document.querySelector(".no").addEventListener("click",()=>{
+ alert("힝.. 다시 생각해봐용..🥹");
+});
+</script>
+
+</body>
+</html>

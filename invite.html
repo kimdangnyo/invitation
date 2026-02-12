@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>맹준이에게 ..💌</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Gaegu&display=swap" rel="stylesheet">
+
+<style>
+body {
+  font-family: 'Gaegu', cursive;
+  background-color: #fff5f5;
+  overflow-x: hidden;
+}
+
+.heart-animation {
+  animation: heartBeat 1.5s infinite;
+}
+
+@keyframes heartBeat {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.falling-heart {
+  position: fixed;
+  top: -50px;
+  pointer-events: none;
+  animation: fall linear forwards;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-50px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+</style>
+</head>
+
+<body class="flex flex-col items-center justify-center min-h-screen p-4 text-gray-800">
+
+<div id="card" class="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center space-y-6">
+        
+<div class="text-6xl heart-animation text-red-400">❤️</div>
+
+<h1 class="text-3xl font-bold text-red-500">
+Happy Valentine's Day 💖
+</h1>
+
+<p class="text-xl leading-relaxed">
+맹주나 ~<br>
+이번 발렌타인데이에 모해 .. ??<br>
+할일 없으면 나랑 데이트.. <br>
+하고싶어?! 하고싶냐고!!
+</p>
+
+<div class="bg-red-50 p-4 rounded-2xl text-left space-y-2">
+<p>📅 날짜: 2026년 2월 14일 토요일</p>
+<p>⏰ 시간: 오후 1시</p>
+<p>📍 장소: 일단은 용산(?)</p>
+</div>
+
+<div id="btn-group" class="flex flex-col space-y-3">
+<button onclick="acceptInvitation()" 
+class="bg-red-400 hover:bg-red-500 text-white py-3 rounded-full text-xl shadow-md">
+완전 하고싶어!!!!🙆🏻‍♂️ (YES)
+</button>
+
+<button id="no-btn" onmouseover="moveButton()" 
+class="border border-gray-300 text-gray-400 py-3 rounded-full text-xl">
+나 바쁜데?🤔 (NO)
+</button>
+</div>
+
+<div id="success-msg" class="hidden space-y-4">
+<p class="text-2xl text-pink-500 font-bold">
+너가 수락한거다!!!<br>
+토요일에 마구마구 뽀뽀해주마😘<br>
+❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️
+</p>
+</div>
+
+</div>
+
+<!-- 카운트다운 -->
+<div class="mt-8 text-gray-500">
+그 날 까지.. 
+<span id="countdown" class="text-red-400 font-bold"></span>
+</div>
+
+<script>
+
+// 카운트다운
+function updateCountdown() {
+    const target = new Date('2026-02-14T13:00:00');
+    const now = new Date();
+    const diff = target - now;
+
+    if (diff <= 0) {
+        document.getElementById('countdown').innerText = "💘 해피 발렌타인데이!";
+        return;
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+
+    document.getElementById('countdown').innerText =
+        `${days}일 ${hours}시간 ${minutes}분 ${seconds}초 남음`;
+}
+
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+// NO 버튼 도망
+function moveButton() {
+  const btn = document.getElementById('no-btn');
+  const x = Math.random() * (window.innerWidth - btn.offsetWidth);
+  const y = Math.random() * (window.innerHeight - btn.offsetHeight);
+
+  btn.style.position = 'absolute';
+  btn.style.left = x + 'px';
+  btn.style.top = y + 'px';
+}
+
+// YES 클릭
+function acceptInvitation() {
+  document.getElementById('btn-group').classList.add('hidden');
+  document.getElementById('success-msg').classList.remove('hidden');
+
+  alert("애기야 사랑한드아🩷🩷🩷🩷🩷🩷🩷🩷🩷🩷🩷🩷🩷🩷");
+  startHeartRain();
+}
+
+// 하트 폭우
+function startHeartRain() {
+
+  const interval = setInterval(() => {
+
+    const heart = document.createElement('div');
+    heart.className = 'falling-heart';
+    heart.innerText = '❤️';
+
+    heart.style.left = Math.random() * 100 + 'vw';
+    heart.style.fontSize = (20 + Math.random() * 40) + 'px';
+    heart.style.animationDuration = (3 + Math.random() * 2) + 's';
+
+    document.body.appendChild(heart);
+
+    setTimeout(() => heart.remove(), 5000);
+
+  }, 50);
+
+}
+</script>
+
+</body>
+</html>
